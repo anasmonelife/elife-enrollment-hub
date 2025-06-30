@@ -6,33 +6,35 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Search } from 'lucide-react';
-import { registrations, categories, panchayaths } from '../data/mockData';
+import { Search, Loader2 } from 'lucide-react';
+import { useSearchRegistration } from '../hooks/useRegistrations';
+import { useCategories } from '../hooks/useCategories';
+import { usePanchayaths } from '../hooks/usePanchayaths';
 import { useToast } from '@/hooks/use-toast';
+import { Registration } from '../types';
 
 const CheckStatus = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResult, setSearchResult] = useState<any>(null);
-  const [isSearching, setIsSearching] = useState(false);
   const { toast } = useToast();
+  
+  const searchRegistration = useSearchRegistration();
+  const { data: categories = [] } = useCategories();
+  const { data: panchayaths = [] } = usePanchayaths();
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
     if (!searchQuery.trim()) {
       toast({ title: "Error", description: "Please enter Customer ID or Mobile Number", variant: "destructive" });
       return;
     }
 
-    setIsSearching(true);
-    console.log('Searching for:', searchQuery);
-
-    setTimeout(() => {
-      const result = registrations.find(reg => 
-        reg.customerId === searchQuery || reg.mobile === searchQuery
-      );
+    try {
+      console.log('Searching for:', searchQuery);
+      const result = await searchRegistration.mutateAsync(searchQuery);
 
       if (result) {
-        const category = categories.find(cat => cat.id === result.categoryId);
-        const panchayath = panchayaths.find(p => p.id === result.panchayathId);
+        const category = categories.find(cat => cat.id === result.category_id);
+        const panchayath = panchayaths.find(p => p.id === result.panchayath_id);
         
         setSearchResult({
           ...result,
@@ -44,9 +46,10 @@ const CheckStatus = () => {
         setSearchResult(null);
         toast({ title: "Not Found", description: "No registration found with this Customer ID or Mobile Number", variant: "destructive" });
       }
-      
-      setIsSearching(false);
-    }, 1000);
+    } catch (error) {
+      console.error('Search error:', error);
+      toast({ title: "Error", description: "Failed to search registration", variant: "destructive" });
+    }
   };
 
   const getStatusColor = (status: string) => {
@@ -104,9 +107,16 @@ const CheckStatus = () => {
                 onClick={handleSearch} 
                 className="w-full" 
                 size="lg"
-                disabled={isSearching}
+                disabled={searchRegistration.isPending}
               >
-                {isSearching ? 'Searching...' : 'Search Status'}
+                {searchRegistration.isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Searching...
+                  </>
+                ) : (
+                  'Search Status'
+                )}
               </Button>
             </div>
           </CardContent>
@@ -128,7 +138,7 @@ const CheckStatus = () => {
                 <div className="space-y-4">
                   <div>
                     <Label className="text-sm font-medium text-gray-500">Customer ID</Label>
-                    <p className="text-lg font-mono">{searchResult.customerId}</p>
+                    <p className="text-lg font-mono">{searchResult.customer_id}</p>
                   </div>
                   
                   <div>
@@ -158,16 +168,16 @@ const CheckStatus = () => {
                     <p className="text-lg">{searchResult.ward}</p>
                   </div>
                   
-                  {searchResult.agentPro && (
+                  {searchResult.agent_pro && (
                     <div>
                       <Label className="text-sm font-medium text-gray-500">Agent/PRO</Label>
-                      <p className="text-lg">{searchResult.agentPro}</p>
+                      <p className="text-lg">{searchResult.agent_pro}</p>
                     </div>
                   )}
                   
                   <div>
                     <Label className="text-sm font-medium text-gray-500">Applied Date</Label>
-                    <p className="text-lg">{new Date(searchResult.createdAt).toLocaleDateString()}</p>
+                    <p className="text-lg">{new Date(searchResult.created_at).toLocaleDateString()}</p>
                   </div>
                 </div>
               </div>

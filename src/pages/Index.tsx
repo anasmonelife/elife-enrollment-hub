@@ -7,48 +7,64 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Category, Registration } from '../types';
-import { categories, announcements, registrations } from '../data/mockData';
+import { useCategories } from '../hooks/useCategories';
+import { useAnnouncements } from '../hooks/useAnnouncements';
+import { useCreateRegistration } from '../hooks/useRegistrations';
 import { useToast } from '@/hooks/use-toast';
+import { Loader2 } from 'lucide-react';
 
 const Index = () => {
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const { toast } = useToast();
+  
+  const { data: categories = [], isLoading: categoriesLoading } = useCategories();
+  const { data: announcements = [], isLoading: announcementsLoading } = useAnnouncements();
+  const createRegistration = useCreateRegistration();
 
   const handleCategorySelect = (category: Category) => {
     setSelectedCategory(category);
     console.log('Selected category:', category);
   };
 
-  const handleRegistrationSubmit = (registrationData: Omit<Registration, 'id' | 'customerId' | 'status' | 'createdAt' | 'updatedAt'>) => {
+  const handleRegistrationSubmit = async (registrationData: Omit<Registration, 'id' | 'customer_id' | 'status' | 'created_at' | 'updated_at'>) => {
     console.log('Registration submitted:', registrationData);
     
-    // Generate customer ID
-    const customerId = `ESEP${registrationData.mobile}${registrationData.name.charAt(0).toUpperCase()}`;
-    
-    // Create new registration
-    const newRegistration: Registration = {
-      id: Date.now().toString(),
-      customerId,
-      ...registrationData,
-      status: 'pending',
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
-    
-    // Add to registrations array (in real app, this would be saved to database)
-    registrations.push(newRegistration);
-    
-    toast({
-      title: "Registration Successful!",
-      description: `Customer ID: ${customerId}. Your application is pending approval.`
-    });
-    
-    setSelectedCategory(null);
+    try {
+      // Generate customer ID
+      const customerId = `ESEP${registrationData.mobile}${registrationData.name.charAt(0).toUpperCase()}`;
+      
+      // Create new registration
+      const newRegistration = {
+        customer_id: customerId,
+        ...registrationData,
+        status: 'pending' as const,
+      };
+      
+      await createRegistration.mutateAsync(newRegistration);
+      
+      toast({
+        title: "Registration Successful!",
+        description: `Customer ID: ${customerId}. Your application is pending approval.`
+      });
+      
+      setSelectedCategory(null);
+    } catch (error) {
+      console.error('Registration error:', error);
+      toast({
+        title: "Registration Failed",
+        description: "There was an error submitting your registration. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
-  const activeAnnouncements = announcements.filter(
-    ann => ann.isActive && new Date(ann.expiryDate) > new Date()
-  );
+  if (categoriesLoading || announcementsLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -71,10 +87,10 @@ const Index = () => {
       </div>
 
       {/* Announcements */}
-      {activeAnnouncements.length > 0 && (
+      {announcements.length > 0 && (
         <div className="bg-yellow-50 border-b border-yellow-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            {activeAnnouncements.map((announcement) => (
+            {announcements.map((announcement) => (
               <div key={announcement.id} className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <Badge variant="secondary">Announcement</Badge>
@@ -142,6 +158,7 @@ const Index = () => {
                 <RegistrationForm
                   selectedCategory={selectedCategory}
                   onSubmit={handleRegistrationSubmit}
+                  isSubmitting={createRegistration.isPending}
                 />
               </div>
             </div>

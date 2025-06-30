@@ -4,9 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { UserCheck } from 'lucide-react';
+import { UserCheck, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { admins } from '../data/mockData';
+import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
 const AdminLogin = () => {
@@ -15,18 +15,34 @@ const AdminLogin = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
-    console.log('Login attempt:', credentials);
-    
-    setTimeout(() => {
-      const admin = admins.find(
-        a => a.username === credentials.username && a.password === credentials.password
-      );
+    try {
+      console.log('Login attempt:', credentials);
+      
+      // Query the admins table to verify credentials
+      const { data: admin, error } = await supabase
+        .from('admins')
+        .select('*')
+        .eq('username', credentials.username)
+        .eq('password_hash', credentials.password) // In production, use proper password hashing
+        .eq('is_active', true)
+        .maybeSingle();
+      
+      if (error) {
+        console.error('Login error:', error);
+        throw error;
+      }
       
       if (admin) {
+        // Update last login time
+        await supabase
+          .from('admins')
+          .update({ last_login: new Date().toISOString() })
+          .eq('id', admin.id);
+        
         localStorage.setItem('adminSession', JSON.stringify({
           id: admin.id,
           username: admin.username,
@@ -48,9 +64,16 @@ const AdminLogin = () => {
           variant: "destructive"
         });
       }
-      
+    } catch (error) {
+      console.error('Login error:', error);
+      toast({
+        title: "Login Failed",
+        description: "An error occurred during login. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   return (
@@ -91,7 +114,14 @@ const AdminLogin = () => {
             </div>
             
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? 'Signing In...' : 'Sign In'}
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Signing In...
+                </>
+              ) : (
+                'Sign In'
+              )}
             </Button>
           </form>
           

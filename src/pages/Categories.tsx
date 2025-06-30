@@ -1,17 +1,27 @@
 
 import Navbar from '../components/Navbar';
 import CategoryCard from '../components/CategoryCard';
-import { categories } from '../data/mockData';
+import { useCategories } from '../hooks/useCategories';
 import { useNavigate } from 'react-router-dom';
 import { Category } from '../types';
+import { Loader2 } from 'lucide-react';
 
 const Categories = () => {
   const navigate = useNavigate();
+  const { data: categories = [], isLoading } = useCategories();
 
   const handleCategorySelect = (category: Category) => {
     console.log('Selected category:', category);
     navigate('/');
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
