@@ -10,11 +10,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { Category, Panchayath, Registration } from '../types';
-import { panchayaths, registrations } from '../data/mockData';
+import { usePanchayaths } from '../hooks/usePanchayaths';
 
 interface RegistrationFormProps {
   selectedCategory: Category;
-  onSubmit: (registration: Omit<Registration, 'id' | 'customerId' | 'status' | 'createdAt' | 'updatedAt'>) => void;
+  onSubmit: (registration: Omit<Registration, 'id' | 'customer_id' | 'status' | 'created_at' | 'updated_at'>) => void;
 }
 
 const RegistrationForm = ({ selectedCategory, onSubmit }: RegistrationFormProps) => {
@@ -22,13 +22,14 @@ const RegistrationForm = ({ selectedCategory, onSubmit }: RegistrationFormProps)
     name: '',
     address: '',
     mobile: '',
-    panchayathId: '',
+    panchayath_id: '',
     ward: '',
-    agentPro: ''
+    agent_pro: ''
   });
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const { data: panchayaths = [] } = usePanchayaths();
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -47,23 +48,12 @@ const RegistrationForm = ({ selectedCategory, onSubmit }: RegistrationFormProps)
       toast({ title: "Error", description: "Address is required", variant: "destructive" });
       return false;
     }
-    if (!formData.panchayathId) {
+    if (!formData.panchayath_id) {
       toast({ title: "Error", description: "Please select a panchayath", variant: "destructive" });
       return false;
     }
     if (!formData.ward.trim()) {
       toast({ title: "Error", description: "Ward is required", variant: "destructive" });
-      return false;
-    }
-    
-    // Check for duplicate mobile number
-    const existingRegistration = registrations.find(reg => reg.mobile === formData.mobile);
-    if (existingRegistration) {
-      toast({ 
-        title: "Error", 
-        description: "This mobile number is already registered", 
-        variant: "destructive" 
-      });
       return false;
     }
     
@@ -78,10 +68,10 @@ const RegistrationForm = ({ selectedCategory, onSubmit }: RegistrationFormProps)
 
   const confirmSubmission = () => {
     setIsSubmitting(true);
-    console.log('Submitting registration:', { ...formData, categoryId: selectedCategory.id });
+    console.log('Submitting registration:', { ...formData, category_id: selectedCategory.id });
     
     setTimeout(() => {
-      onSubmit({ ...formData, categoryId: selectedCategory.id });
+      onSubmit({ ...formData, category_id: selectedCategory.id });
       setIsSubmitting(false);
       setShowConfirmation(false);
       
@@ -98,14 +88,14 @@ const RegistrationForm = ({ selectedCategory, onSubmit }: RegistrationFormProps)
         name: '',
         address: '',
         mobile: '',
-        panchayathId: '',
+        panchayath_id: '',
         ward: '',
-        agentPro: ''
+        agent_pro: ''
       });
     }, 1500);
   };
 
-  const selectedPanchayath = panchayaths.find(p => p.id === formData.panchayathId);
+  const selectedPanchayath = panchayaths.find(p => p.id === formData.panchayath_id);
 
   return (
     <>
@@ -161,7 +151,7 @@ const RegistrationForm = ({ selectedCategory, onSubmit }: RegistrationFormProps)
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="panchayath">Panchayath *</Label>
-                <Select onValueChange={(value) => handleInputChange('panchayathId', value)}>
+                <Select onValueChange={(value) => handleInputChange('panchayath_id', value)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select panchayath" />
                   </SelectTrigger>
@@ -191,8 +181,8 @@ const RegistrationForm = ({ selectedCategory, onSubmit }: RegistrationFormProps)
               <Label htmlFor="agentPro">Agent/P.R.O</Label>
               <Input
                 id="agentPro"
-                value={formData.agentPro}
-                onChange={(e) => handleInputChange('agentPro', e.target.value)}
+                value={formData.agent_pro}
+                onChange={(e) => handleInputChange('agent_pro', e.target.value)}
                 placeholder="Enter agent or PRO name (optional)"
               />
             </div>
@@ -219,26 +209,26 @@ const RegistrationForm = ({ selectedCategory, onSubmit }: RegistrationFormProps)
                 <div><strong>Mobile:</strong> {formData.mobile}</div>
                 <div><strong>Panchayath:</strong> {selectedPanchayath?.name} - {selectedPanchayath?.district}</div>
                 <div><strong>Ward:</strong> {formData.ward}</div>
-                {formData.agentPro && <div><strong>Agent/PRO:</strong> {formData.agentPro}</div>}
+                {formData.agent_pro && <div><strong>Agent/PRO:</strong> {formData.agent_pro}</div>}
               </div>
             </div>
             
             <div className="bg-blue-50 p-4 rounded-lg">
               <h4 className="font-semibold text-blue-800 mb-2">Fee Details:</h4>
-              {selectedCategory.actualFee === 0 ? (
+              {selectedCategory.actual_fee === 0 ? (
                 <div className="text-green-600 font-bold">FREE Registration</div>
               ) : (
                 <div className="space-y-1 text-sm">
                   <div className="flex justify-between">
                     <span>Actual Fee:</span>
-                    <span className="line-through text-gray-500">₹{selectedCategory.actualFee}</span>
+                    <span className="line-through text-gray-500">₹{selectedCategory.actual_fee}</span>
                   </div>
                   <div className="flex justify-between font-semibold text-green-600">
                     <span>Offer Fee:</span>
-                    <span>₹{selectedCategory.offerFee}</span>
+                    <span>₹{selectedCategory.offer_fee}</span>
                   </div>
                   <div className="text-center text-green-600 font-bold">
-                    You Save: ₹{selectedCategory.actualFee - selectedCategory.offerFee}
+                    You Save: ₹{selectedCategory.actual_fee - selectedCategory.offer_fee}
                   </div>
                 </div>
               )}

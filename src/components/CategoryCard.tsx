@@ -12,7 +12,7 @@ interface CategoryCardProps {
 
 const CategoryCard = ({ category, onSelect, isSelected }: CategoryCardProps) => {
   const isSpecial = category.name.includes('Job Card');
-  const isFree = category.actualFee === 0;
+  const isFree = category.actual_fee === 0;
   
   return (
     <Card 
@@ -49,15 +49,15 @@ const CategoryCard = ({ category, onSelect, isSelected }: CategoryCardProps) => 
             <>
               <div className="flex justify-between items-center">
                 <span className="text-gray-500 text-sm">Actual Fee:</span>
-                <span className="text-gray-500 line-through">₹{category.actualFee}</span>
+                <span className="text-gray-500 line-through">₹{category.actual_fee}</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-green-600 font-medium">Offer Fee:</span>
-                <span className="text-green-600 font-bold text-lg">₹{category.offerFee}</span>
+                <span className="text-green-600 font-bold text-lg">₹{category.offer_fee}</span>
               </div>
               <div className="text-center">
                 <Badge variant="secondary" className="bg-green-100 text-green-800">
-                  Save ₹{category.actualFee - category.offerFee}
+                  Save ₹{category.actual_fee - category.offer_fee}
                 </Badge>
               </div>
             </>

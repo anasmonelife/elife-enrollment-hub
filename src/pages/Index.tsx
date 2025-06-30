@@ -158,7 +158,6 @@ const Index = () => {
                 <RegistrationForm
                   selectedCategory={selectedCategory}
                   onSubmit={handleRegistrationSubmit}
-                  isSubmitting={createRegistration.isPending}
                 />
               </div>
             </div>
