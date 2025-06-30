@@ -26,8 +26,8 @@ const AdminLogin = () => {
       const { data: admin, error } = await supabase
         .from('admins')
         .select('*')
-        .eq('username', credentials.username)
-        .eq('password_hash', credentials.password) // In production, use proper password hashing
+        .eq('username', credentials.username.toLowerCase())
+        .eq('password_hash', credentials.password.toLowerCase()) // Convert to lowercase for comparison
         .eq('is_active', true)
         .maybeSingle();
       
@@ -35,6 +35,8 @@ const AdminLogin = () => {
         console.error('Login error:', error);
         throw error;
       }
+      
+      console.log('Admin query result:', admin);
       
       if (admin) {
         // Update last login time

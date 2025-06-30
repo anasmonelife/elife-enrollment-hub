@@ -9,6 +9,7 @@ import About from "./pages/About";
 import Categories from "./pages/Categories";
 import CheckStatus from "./pages/CheckStatus";
 import AdminLogin from "./pages/AdminLogin";
+import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ const App = () => (
           <Route path="/categories" element={<Categories />} />
           <Route path="/check-status" element={<CheckStatus />} />
           <Route path="/admin-login" element={<AdminLogin />} />
+          <Route path="/admin" element={<AdminDashboard />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
