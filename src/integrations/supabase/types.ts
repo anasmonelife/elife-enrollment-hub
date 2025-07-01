@@ -9,7 +9,177 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      admin_users: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          last_login: string | null
+          password_hash: string
+          role: string
+          username: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          last_login?: string | null
+          password_hash: string
+          role: string
+          username: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          last_login?: string | null
+          password_hash?: string
+          role?: string
+          username?: string
+        }
+        Relationships: []
+      }
+      announcements: {
+        Row: {
+          content: string
+          created_at: string
+          expiry_date: string | null
+          id: string
+          is_active: boolean
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          expiry_date?: string | null
+          id?: string
+          is_active?: boolean
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          expiry_date?: string | null
+          id?: string
+          is_active?: boolean
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      categories: {
+        Row: {
+          actual_fee: number
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          offer_fee: number
+          popup_image_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          actual_fee: number
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          offer_fee: number
+          popup_image_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          actual_fee?: number
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          offer_fee?: number
+          popup_image_url?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      panchayaths: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+        }
+        Relationships: []
+      }
+      registrations: {
+        Row: {
+          address: string
+          category_id: string
+          created_at: string
+          customer_id: string
+          email: string | null
+          full_name: string
+          id: string
+          panchayath_id: string
+          phone: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          address: string
+          category_id: string
+          created_at?: string
+          customer_id: string
+          email?: string | null
+          full_name: string
+          id?: string
+          panchayath_id: string
+          phone: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          address?: string
+          category_id?: string
+          created_at?: string
+          customer_id?: string
+          email?: string | null
+          full_name?: string
+          id?: string
+          panchayath_id?: string
+          phone?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "registrations_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "registrations_panchayath_id_fkey"
+            columns: ["panchayath_id"]
+            isOneToOne: false
+            referencedRelation: "panchayaths"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

@@ -7,13 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Shield, Loader2 } from 'lucide-react';
-
-// Admin credentials - in a real app, these would be stored securely in a database
-const ADMIN_CREDENTIALS = [
-  { username: 'anas', password: 'eva919123', role: 'super_admin' },
-  { username: 'adminlocal', password: 'admin9094', role: 'local_admin' },
-  { username: 'adminuser', password: 'user123', role: 'user_admin' }
-];
+import { supabase } from '@/integrations/supabase/client';
 
 const AdminLoginPage = () => {
   const navigate = useNavigate();
@@ -29,13 +23,21 @@ const AdminLoginPage = () => {
     setIsLoading(true);
 
     try {
-      // Simulate a brief loading delay for better UX
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      console.log('Attempting login with:', credentials.username);
+      
+      // Query the admin_users table directly
+      const { data: adminUser, error } = await supabase
+        .from('admin_users')
+        .select('*')
+        .eq('username', credentials.username.toLowerCase())
+        .eq('password_hash', credentials.password.toLowerCase())
+        .eq('is_active', true)
+        .single();
 
-      // Check credentials against the predefined admin users
-      const adminUser = ADMIN_CREDENTIALS.find(
-        admin => admin.username === credentials.username && admin.password === credentials.password
-      );
+      if (error) {
+        console.error('Login query error:', error);
+        throw new Error('Invalid credentials');
+      }
 
       if (adminUser) {
         // Create session data
@@ -47,6 +49,12 @@ const AdminLoginPage = () => {
         };
 
         localStorage.setItem('adminSession', JSON.stringify(sessionData));
+
+        // Update last login
+        await supabase
+          .from('admin_users')
+          .update({ last_login: new Date().toISOString() })
+          .eq('id', adminUser.id);
 
         toast({
           title: "Login Successful",
@@ -120,6 +128,13 @@ const AdminLoginPage = () => {
               )}
             </Button>
           </form>
+          
+          <div className="mt-4 text-xs text-gray-500 space-y-1">
+            <p><strong>Test Credentials:</strong></p>
+            <p>Super Admin: anas / eva919123</p>
+            <p>Local Admin: adminlocal / admin9094</p>
+            <p>User Admin: adminuser / user123</p>
+          </div>
         </CardContent>
       </Card>
     </div>
