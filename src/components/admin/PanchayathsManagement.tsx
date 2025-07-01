@@ -42,7 +42,7 @@ const PanchayathsManagement = ({ permissions }: { permissions: any }) => {
       console.log('Fetching panchayaths...');
       const { data, error } = await supabase
         .from('panchayaths')
-        .select('*')
+        .select('id, name, district, created_at, updated_at')
         .order('district', { ascending: true })
         .order('name', { ascending: true });
       

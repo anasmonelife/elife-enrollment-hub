@@ -26,7 +26,15 @@ const StatusCheckPage = () => {
       const { data, error } = await supabase
         .from('registrations')
         .select(`
-          *,
+          id,
+          customer_id,
+          name,
+          mobile_number,
+          address,
+          ward,
+          status,
+          fee_paid,
+          created_at,
           categories (name, actual_fee, offer_fee),
           panchayaths (name, district)
         `)

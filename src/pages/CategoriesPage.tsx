@@ -15,7 +15,7 @@ const CategoriesPage = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('categories')
-        .select('*')
+        .select('id, name, actual_fee, offer_fee, is_active, is_highlighted')
         .eq('is_active', true)
         .order('name');
       

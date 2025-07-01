@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -26,9 +27,9 @@ interface Panchayath {
 }
 
 interface RegistrationData {
-  name: string;
+  full_name: string;
+  phone: string;
   address: string;
-  mobile_number: string;
   panchayath_id: string;
   ward: string;
   agent_pro: string;
@@ -74,7 +75,7 @@ const RegistrationPage = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('panchayaths')
-        .select('*')
+        .select('id, name, district')
         .order('name');
       
       if (error) throw error;
@@ -102,9 +103,9 @@ const RegistrationPage = () => {
 
     try {
       const registrationData: RegistrationData = {
-        name: formData.name,
+        full_name: formData.name,
+        phone: formData.mobile_number,
         address: formData.address,
-        mobile_number: formData.mobile_number,
         panchayath_id: formData.panchayath_id || '',
         ward: formData.ward,
         agent_pro: formData.agent_pro || '',
@@ -224,7 +225,7 @@ const RegistrationPage = () => {
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Registration Form</h1>
-          <p className="text-gray-600">Please fill in your details for {category.name}</p>
+          <p className="text-gray-600">Please fill in your details for {category?.name}</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -335,21 +336,21 @@ const RegistrationPage = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <h3 className="font-semibold text-lg">{category.name}</h3>
+                  <h3 className="font-semibold text-lg">{category?.name}</h3>
                 </div>
                 
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span className="text-gray-600">Regular Fee:</span>
-                    <span className="line-through text-gray-400">₹{category.actual_fee}</span>
+                    <span className="line-through text-gray-400">₹{category?.actual_fee}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Offer Price:</span>
-                    <span className="font-bold text-green-600">₹{category.offer_fee}</span>
+                    <span className="font-bold text-green-600">₹{category?.offer_fee}</span>
                   </div>
                   <div className="flex justify-between border-t pt-2">
                     <span className="font-semibold">You Save:</span>
-                    <span className="font-bold text-red-600">₹{category.actual_fee - category.offer_fee}</span>
+                    <span className="font-bold text-red-600">₹{(category?.actual_fee || 0) - (category?.offer_fee || 0)}</span>
                   </div>
                 </div>
 

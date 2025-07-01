@@ -75,6 +75,7 @@ export type Database = {
           created_at: string
           id: string
           is_active: boolean
+          is_highlighted: boolean
           name: string
           offer_fee: number
           popup_image_url: string | null
@@ -85,6 +86,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_active?: boolean
+          is_highlighted?: boolean
           name: string
           offer_fee: number
           popup_image_url?: string | null
@@ -95,6 +97,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_active?: boolean
+          is_highlighted?: boolean
           name?: string
           offer_fee?: number
           popup_image_url?: string | null
@@ -105,63 +108,84 @@ export type Database = {
       panchayaths: {
         Row: {
           created_at: string
+          district: string
           id: string
           is_active: boolean
           name: string
+          updated_at: string
         }
         Insert: {
           created_at?: string
+          district?: string
           id?: string
           is_active?: boolean
           name: string
+          updated_at?: string
         }
         Update: {
           created_at?: string
+          district?: string
           id?: string
           is_active?: boolean
           name?: string
+          updated_at?: string
         }
         Relationships: []
       }
       registrations: {
         Row: {
           address: string
+          agent_pro: string | null
           category_id: string
           created_at: string
           customer_id: string
           email: string | null
+          fee_paid: number | null
           full_name: string
           id: string
+          mobile_number: string | null
+          name: string | null
           panchayath_id: string
           phone: string
           status: string
           updated_at: string
+          ward: string | null
         }
         Insert: {
           address: string
+          agent_pro?: string | null
           category_id: string
           created_at?: string
           customer_id: string
           email?: string | null
+          fee_paid?: number | null
           full_name: string
           id?: string
+          mobile_number?: string | null
+          name?: string | null
           panchayath_id: string
           phone: string
           status?: string
           updated_at?: string
+          ward?: string | null
         }
         Update: {
           address?: string
+          agent_pro?: string | null
           category_id?: string
           created_at?: string
           customer_id?: string
           email?: string | null
+          fee_paid?: number | null
           full_name?: string
           id?: string
+          mobile_number?: string | null
+          name?: string | null
           panchayath_id?: string
           phone?: string
           status?: string
           updated_at?: string
+          ward?: string | null
         }
         Relationships: [
           {

@@ -58,7 +58,19 @@ const RegistrationsManagement = ({ permissions }: { permissions: any }) => {
       let query = supabase
         .from('registrations')
         .select(`
-          *,
+          id,
+          customer_id,
+          name,
+          mobile_number,
+          address,
+          ward,
+          agent_pro,
+          status,
+          fee_paid,
+          created_at,
+          updated_at,
+          category_id,
+          panchayath_id,
           categories (name),
           panchayaths (name, district)
         `)
